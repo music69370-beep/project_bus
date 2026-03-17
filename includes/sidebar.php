@@ -27,18 +27,25 @@
     <div class="py-4 px-3">
         <h5 class="text-white mb-0"><i class="fas fa-bus-alt me-2 text-info"></i> ຄິວລົດອັດສະລິຍະ</h5>
     </div>
+    
     <div class="mt-3">
         <a href="index.php" class="active"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a>
-        <a href="manage_trips.php"><i class="fas fa-route me-2"></i> ຈັດການຖ້ຽວລົດ</a>
-        <a href="manage_bookings.php"><i class="fas fa-clipboard-list me-2"></i> ການຈອງປີ້</a>
-        <a href="manage_vehicles.php"><i class="fas fa-bus me-2"></i> ຂໍ້ມູນລົດ</a>
+        
+        <hr class="text-secondary mx-3 my-2"> <a href="manage_bookings.php"><i class="fas fa-ticket-alt me-2 text-warning"></i> ການຈອງປີ້</a>
+        <a href="manage_trips.php"><i class="fas fa-calendar-check me-2"></i> ຈັດການຖ້ຽວລົດ</a>
+        
+        <hr class="text-secondary mx-3 my-2">
+        
         <a href="manage_routes.php"><i class="fas fa-map-marked-alt me-2"></i> ຈັດການເສັ້ນທາງ</a>
-        
         <a href="manage_schedules.php"><i class="fas fa-clock me-2"></i> ຈັດການເວລາອອກລົດ</a>
-        
+        <a href="manage_vehicles.php"><i class="fas fa-bus me-2"></i> ຂໍ້ມູນລົດ</a>
         <a href="manage_drivers.php"><i class="fas fa-user-tie me-2"></i> ຄົນຂັບລົດ</a>
+        
+        <hr class="text-secondary mx-3 my-2">
+        
         <a href="reports.php"><i class="fas fa-chart-pie me-2"></i> ບົດລາຍງານ</a>
     </div>
+
     <div style="position: absolute; bottom: 20px; width: 100%;">
         <a href="logout.php" class="text-danger"><i class="fas fa-sign-out-alt me-2"></i> ອອກຈາກລະບົບ</a>
     </div>

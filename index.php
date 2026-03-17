@@ -112,20 +112,23 @@ $total_vehicles = $v_count['total_vehicles'] ?? 0;
                     <tbody>
                         <?php
                         // ດຶງຂໍ້ມູນ 5 ລາຍການລ່າສຸດ
-                        $stmt_recent = $conn->query("SELECT b.*, r.origin, r.destination, t.trip_date 
-                                                   FROM Bookings b 
-                                                   JOIN Trips t ON b.trip_id = t.trip_id 
-                                                   JOIN Schedules s ON t.schedule_id = s.schedule_id 
-                                                   JOIN Routes r ON s.route_id = r.route_id 
-                                                   ORDER BY b.created_at DESC LIMIT 5");
-                        while($row = $stmt_recent->fetch()) {
-                            echo "<tr>
-                                    <td><strong>{$row['customer_name']}</strong></td>
-                                    <td>{$row['origin']} - {$row['destination']}</td>
-                                    <td>".date('d/m/Y', strtotime($row['trip_date']))."</td>
-                                    <td class='text-success font-weight-bold'>".number_format($row['net_amount'])." ກີບ</td>
-                                  </tr>";
-                        }
+                        // ປ່ຽນ Query ບ່ອນ $stmt_recent ໃນ index.php
+$stmt_recent = $conn->query("SELECT b.*, r.origin, r.destination, t.trip_date, s.departure_time 
+                            FROM Bookings b 
+                            JOIN Trips t ON b.trip_id = t.trip_id 
+                            JOIN Schedules s ON t.schedule_id = s.schedule_id 
+                            JOIN Routes r ON s.route_id = r.route_id 
+                            ORDER BY b.created_at DESC LIMIT 5");
+
+// ບ່ອນ Echo ໃນ tbody
+while($row = $stmt_recent->fetch()) {
+    echo "<tr>
+            <td><strong>{$row['customer_name']}</strong></td>
+            <td>{$row['origin']} - {$row['destination']} <br> <small class='text-primary'>ເວລາ: ".date('H:i', strtotime($row['departure_time']))."</small></td>
+            <td>".date('d/m/Y', strtotime($row['trip_date']))."</td>
+            <td class='text-success font-weight-bold'>".number_format($row['net_amount'])." ກີບ</td>
+          </tr>";
+}
                         ?>
                     </tbody>
                 </table>

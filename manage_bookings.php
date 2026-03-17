@@ -15,7 +15,7 @@ $stmt = $conn->prepare($query);
 $stmt->execute();
 $bookings = $stmt->fetchAll();
 
-// ດຶງຖ້ຽວລົດທີ່ວ່າງຢູ່ມາໃຫ້ເລືອກຈອງ (ເພີ່ມການດຶງ departure_time)
+// ດຶງຖ້ຽວລົດທີ່ວ່າງ
 $trips = $conn->query("SELECT t.trip_id, t.trip_date, r.origin, r.destination, r.base_price_person, t.available_seats, s.departure_time 
                        FROM Trips t 
                        JOIN Schedules s ON t.schedule_id = s.schedule_id
@@ -65,7 +65,7 @@ $trips = $conn->query("SELECT t.trip_id, t.trip_date, r.origin, r.destination, r
     </div>
 </div>
 
-<div class="modal fade" id="addBookingModal" tabindex="-1">
+<div class="modal fade" id="addBookingModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <form action="actions/save_booking.php" method="POST">
@@ -77,61 +77,43 @@ $trips = $conn->query("SELECT t.trip_id, t.trip_date, r.origin, r.destination, r
                     <div class="mb-3">
                         <label class="form-label">ເລືອກຖ້ຽວລົດ</label>
                         <select name="trip_id" class="form-control" required id="select_trip">
-    <option value="">-- ເລືອກຖ້ຽວ --</option>
-    <?php foreach($trips as $t): ?>
-        <option value="<?php echo $t['trip_id']; ?>" 
-                data-price="<?php echo $t['base_price_person']; ?>"
-                data-time="<?php echo date('H:i', strtotime($t['departure_time'])); ?>"
-                data-seats="<?php echo $t['available_seats']; ?>">
-            <?php echo $t['origin']; ?> - <?php echo $t['destination']; ?> 
-            (<?php echo $t['departure_time']; ?>) - ວ່າງ: <?php echo $t['available_seats']; ?> ບ່ອນ
-        </option>
-    <?php endforeach; ?>
-</select>
-
-<script>
-document.getElementById('select_trip').addEventListener('change', function() {
-    const opt = this.options[this.selectedIndex];
-    if(!opt.value) return;
-
-    const price = opt.getAttribute('data-price');
-    const time = opt.getAttribute('data-time');
-    const seats = opt.getAttribute('data-seats');
-
-    document.getElementById('total_price').value = price;
-    document.getElementById('booking_time').value = time;
-
-    if(parseInt(seats) <= 0) {
-        Swal.fire('ຂໍອະໄພ!', 'ບ່ອນນັ່ງໃນຖ້ຽວນີ້ເຕັມແລ້ວ', 'error');
-        this.value = "";
-    }
-});
-</script>
+                            <option value="">-- ເລືອກຖ້ຽວ --</option>
+                            <?php foreach($trips as $t): ?>
+                                <option value="<?php echo $t['trip_id']; ?>" 
+                                        data-price="<?php echo $t['base_price_person']; ?>"
+                                        data-time="<?php echo date('H:i', strtotime($t['departure_time'])); ?>"
+                                        data-seats="<?php echo $t['available_seats']; ?>">
+                                    <?php echo $t['origin']; ?> - <?php echo $t['destination']; ?> 
+                                    (<?php echo $t['departure_time']; ?>) - ວ່າງ: <?php echo $t['available_seats']; ?> ບ່ອນ
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <div id="time_info" class="mt-2" style="display:none;">
+                            <span class="badge bg-light text-primary border border-primary">
+                                <i class="fas fa-clock me-1"></i> ເວລາອອກລົດ: <strong id="show_time"></strong>
+                            </span>
+                        </div>
                     </div>
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">ຊື່ລູກຄ້າ</label>
-                            <input type="text" name="customer_name" class="form-control" required>
+                            <input type="text" name="customer_name" class="form-control" placeholder="ໃສ່ຊື່ລູກຄ້າ" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">ເບີໂທ</label>
-                            <input type="text" name="customer_phone" class="form-control" required>
+                            <input type="text" name="customer_phone" class="form-control" placeholder="020..." required>
                         </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">ເວລາອອກລົດ (ອັດຕະໂນມັດ)</label>
-                        <input type="time" name="booking_time" id="booking_time" class="form-control" value="<?php echo date('H:i'); ?>">
-                        <small class="text-muted">* ລະບົບຈະດຶງເວລາຈາກຖ້ຽວລົດມາໃຫ້ ຫຼື ປ່ຽນເອງໄດ້</small>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">ລາຄາປີ້ (ກີບ)</label>
-                        <input type="number" name="net_amount" id="total_price" class="form-control" readonly>
+                        <label class="form-label">ລາຄາທີ່ຕ້ອງຈ່າຍ (ກີບ)</label>
+                        <input type="number" name="net_amount" id="total_price" class="form-control bg-light" readonly>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-success w-100">ຢືນຢັນການຈອງ ແລະ ຮັບເງິນ</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ຍົກເລີກ</button>
+                    <button type="submit" class="btn btn-success px-4">ຢືນຢັນການຈອງ ແລະ ຮັບເງິນ</button>
                 </div>
             </form>
         </div>
@@ -139,18 +121,37 @@ document.getElementById('select_trip').addEventListener('change', function() {
 </div>
 
 <script>
-// Logic ດຶງລາຄາ ແລະ ເວລາ ອັດຕະໂນມັດເມື່ອເລືອກຖ້ຽວລົດ
+// Logic ຈັດການເລືອກ Trip
 document.getElementById('select_trip').addEventListener('change', function() {
-    const selectedOption = this.options[this.selectedIndex];
-    
-    // ດຶງລາຄາ
-    const price = selectedOption.getAttribute('data-price');
-    document.getElementById('total_price').value = price;
+    const opt = this.options[this.selectedIndex];
+    const timeInfo = document.getElementById('time_info');
+    const showTime = document.getElementById('show_time');
+    const totalPrice = document.getElementById('total_price');
 
-    // ດຶງເວລາ
-    const time = selectedOption.getAttribute('data-time');
-    if(time) {
-        document.getElementById('booking_time').value = time;
+    if(!opt.value) {
+        timeInfo.style.display = 'none';
+        totalPrice.value = '';
+        return;
+    }
+
+    const price = opt.getAttribute('data-price');
+    const time = opt.getAttribute('data-time');
+    const seats = opt.getAttribute('data-seats');
+
+    totalPrice.value = price;
+    showTime.innerText = time;
+    timeInfo.style.display = 'block';
+
+    if(parseInt(seats) <= 0) {
+        Swal.fire({
+            icon: 'error',
+            title: 'ບ່ອນນັ່ງເຕັມ!',
+            text: 'ຂໍອະໄພ, ຖ້ຽວລົດນີ້ເຕັມແລ້ວ.',
+            confirmButtonColor: '#10b981'
+        });
+        this.value = "";
+        timeInfo.style.display = 'none';
+        totalPrice.value = '';
     }
 });
 </script>
