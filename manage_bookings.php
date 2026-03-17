@@ -55,7 +55,7 @@ $trips = $conn->query("SELECT t.trip_id, t.trip_date, r.origin, r.destination, r
                     <td class="text-success font-weight-bold"><?php echo number_format($row['net_amount']); ?> ກີບ</td>
                     <td><span class="badge bg-success"><?php echo $row['booking_status']; ?></span></td>
                     <td>
-                        <a href="print_ticket.php?id=<?php echo $row['booking_id']; ?>" target="_blank" class="btn btn-sm btn-outline-primary">
+                        <a href="print_ticket.php?group_id=<?php echo $ticket['group_id'] ?: $row['group_id']; ?>&id=<?php echo $row['booking_id']; ?>" target="_blank" class="btn btn-sm btn-outline-primary">
                         <i class="fas fa-print"></i> ພິມປີ້</a>
                     </td>
                 </tr>
@@ -67,53 +67,54 @@ $trips = $conn->query("SELECT t.trip_id, t.trip_date, r.origin, r.destination, r
 
 <div class="modal fade" id="addBookingModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg">
             <form action="actions/save_booking.php" method="POST">
                 <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title">ບັນທຶກການຈອງປີ້</h5>
+                    <h5 class="modal-title"><i class="fas fa-ticket-alt me-2"></i> ບັນທຶກການຈອງປີ້ໃໝ່</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">ເລືອກຖ້ຽວລົດ</label>
+                        <label class="form-label font-weight-bold">ເລືອກຖ້ຽວລົດ</label>
                         <select name="trip_id" class="form-control" required id="select_trip">
                             <option value="">-- ເລືອກຖ້ຽວ --</option>
                             <?php foreach($trips as $t): ?>
                                 <option value="<?php echo $t['trip_id']; ?>" 
                                         data-price="<?php echo $t['base_price_person']; ?>"
-                                        data-time="<?php echo date('H:i', strtotime($t['departure_time'])); ?>"
                                         data-seats="<?php echo $t['available_seats']; ?>">
                                     <?php echo $t['origin']; ?> - <?php echo $t['destination']; ?> 
-                                    (<?php echo $t['departure_time']; ?>) - ວ່າງ: <?php echo $t['available_seats']; ?> ບ່ອນ
+                                    (<?php echo date('H:i', strtotime($t['departure_time'])); ?>) - ວ່າງ: <?php echo $t['available_seats']; ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <div id="time_info" class="mt-2" style="display:none;">
-                            <span class="badge bg-light text-primary border border-primary">
-                                <i class="fas fa-clock me-1"></i> ເວລາອອກລົດ: <strong id="show_time"></strong>
-                            </span>
-                        </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">ຊື່ລູກຄ້າ</label>
-                            <input type="text" name="customer_name" class="form-control" placeholder="ໃສ່ຊື່ລູກຄ້າ" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">ເບີໂທ</label>
-                            <input type="text" name="customer_phone" class="form-control" placeholder="020..." required>
+                    <div class="mb-3">
+                        <label class="form-label text-primary font-weight-bold">ຈຳນວນປີ້ (ບ່ອນນັ່ງ)</label>
+                        <input type="number" name="num_seats" id="num_seats" class="form-control" value="1" min="1" required>
+                    </div>
+
+                    <label class="form-label small font-weight-bold text-success">ລາຍຊື່ຜູ້ໂດຍສານ:</label>
+                    <div id="passenger_inputs" class="p-3 border rounded bg-light mb-3" style="max-height: 200px; overflow-y: auto;">
+                        <div class="mb-2">
+                            <label class="form-label small mb-1">ຊື່ຜູ້ໂດຍສານ 1 (ຫົວໜ້າກຸ່ມ)</label>
+                            <input type="text" name="passenger_names[]" class="form-control form-control-sm" placeholder="ກອກຊື່ແທ້" required>
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">ລາຄາທີ່ຕ້ອງຈ່າຍ (ກີບ)</label>
-                        <input type="number" name="net_amount" id="total_price" class="form-control bg-light" readonly>
+                        <label class="form-label font-weight-bold">ເບີໂທຕິດຕໍ່ (ໃຊ້ເບີດຽວກັນທັງກຸ່ມ)</label>
+                        <input type="text" name="customer_phone" class="form-control" placeholder="020..." required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">ລາຄາລວມທັງໝົດ (ກີບ)</label>
+                        <input type="number" name="net_amount" id="total_price" class="form-control bg-white text-danger fw-bold" style="font-size: 1.3rem;" readonly>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ຍົກເລີກ</button>
-                    <button type="submit" class="btn btn-success px-4">ຢືນຢັນການຈອງ ແລະ ຮັບເງິນ</button>
+                    <button type="submit" class="btn btn-success px-4">ຢືນຢັນການຈອງ</button>
                 </div>
             </form>
         </div>
@@ -121,39 +122,43 @@ $trips = $conn->query("SELECT t.trip_id, t.trip_date, r.origin, r.destination, r
 </div>
 
 <script>
-// Logic ຈັດການເລືອກ Trip
-document.getElementById('select_trip').addEventListener('change', function() {
-    const opt = this.options[this.selectedIndex];
-    const timeInfo = document.getElementById('time_info');
-    const showTime = document.getElementById('show_time');
+(function() {
+    const selectTrip = document.getElementById('select_trip');
+    const numSeats = document.getElementById('num_seats');
+    const container = document.getElementById('passenger_inputs');
     const totalPrice = document.getElementById('total_price');
 
-    if(!opt.value) {
-        timeInfo.style.display = 'none';
-        totalPrice.value = '';
-        return;
+    function updateUI() {
+        const opt = selectTrip.options[selectTrip.selectedIndex];
+        if(!opt || !opt.value) {
+            totalPrice.value = '';
+            return;
+        }
+
+        const price = parseFloat(opt.getAttribute('data-price'));
+        const available = parseInt(opt.getAttribute('data-seats'));
+        let count = parseInt(numSeats.value) || 1;
+
+        if(count > available) {
+            alert('ຂໍອະໄພ, ບ່ອນນັ່ງວ່າງເຫຼືອພຽງ ' + available + ' ບ່ອນ');
+            count = available;
+            numSeats.value = available;
+        }
+
+        container.innerHTML = '';
+        for(let i = 1; i <= count; i++) {
+            container.innerHTML += `
+                <div class="mb-2">
+                    <label class="form-label small mb-1">ຊື່ຜູ້ໂດຍສານ ${i} ${i==1 ? '(ຫົວໜ້າ)' : ''}</label>
+                    <input type="text" name="passenger_names[]" class="form-control form-control-sm" placeholder="ກອກຊື່ແທ້..." required>
+                </div>`;
+        }
+        totalPrice.value = Math.floor(count * price);
     }
 
-    const price = opt.getAttribute('data-price');
-    const time = opt.getAttribute('data-time');
-    const seats = opt.getAttribute('data-seats');
-
-    totalPrice.value = price;
-    showTime.innerText = time;
-    timeInfo.style.display = 'block';
-
-    if(parseInt(seats) <= 0) {
-        Swal.fire({
-            icon: 'error',
-            title: 'ບ່ອນນັ່ງເຕັມ!',
-            text: 'ຂໍອະໄພ, ຖ້ຽວລົດນີ້ເຕັມແລ້ວ.',
-            confirmButtonColor: '#10b981'
-        });
-        this.value = "";
-        timeInfo.style.display = 'none';
-        totalPrice.value = '';
-    }
-});
+    selectTrip.addEventListener('change', updateUI);
+    numSeats.addEventListener('input', updateUI);
+})();
 </script>
 
 <?php include 'includes/footer.php'; ?>
